@@ -35,7 +35,7 @@ project/
 
 **Используемые технологии**
 
-- Python 3.10+
+- Python 3.10
 - Apache Airflow
 - pandas, scikit-learn, joblib
 - bash + argparse
@@ -51,11 +51,7 @@ project/
 
 **DAG-файл: (pipeline_dag.py)**
 
-Настроен в Airflow на выполнение по требованию (schedule: `None`). Включает 5 связанных задач одна за другой.
-
-```bash
-airflow dags trigger ml_pipeline_dag
-```
+Настроен в Airflow на выполнение по требованию. Включает 5 связанных задач одна за другой.
 
 **Метрики модели**
 
