@@ -274,14 +274,14 @@ if __name__ == "__main__":
 
 
 ---
-## Этап 4. Метрики - (metrics.py)
+## Этап 4. Метрики
 
-### Скрипт 4
+### Скрипт 4 - (metrics.py)
 
 **Работа скрипта:**
 
 
-**Код etl/preprocess.py**
+**Код etl/metrics.py**
 
 ```python
 import pandas as pd
@@ -343,7 +343,7 @@ if __name__ == "__main__":
 
 
 ---
-## Этап 5. Сохранение результатов ()
+## Этап 5. Сохранение результатов
 
 ### Скрипт 5 - (save_results.py)
 
@@ -351,7 +351,7 @@ if __name__ == "__main__":
 
 
 
-**Код etl/preprocess.py**
+**Код etl/save_results.py**
 
 ```python
 import os
@@ -394,18 +394,19 @@ if __name__ == "__main__":
 **Запуск**
 
 ---
-## Этап 6. Оркестрация процесса ()
+## Этап 6. Оркестрация процесса
 
 ### Скрипт 6 - оркестрирация всех этапов ETL и ML-пайплайна (pipeline_dag.py)
 
 **Работа скрипта:**
+
 1. Загрузка данных и EDA
 2. Предобработка
 3. Обучение модели
 4. Расчёт метрик
 5. Финализация артефактов
 
-**Код etl/preprocess.py**
+**Код pipeline_dag.py**
 
 ```python
 from airflow import DAG
@@ -451,7 +452,7 @@ with DAG(
         task_id='save_results',
         bash_command='python /opt/airflow/etl/save_results.py --source /opt/airflow/results --output /opt/airflow/results/final'
     )
-
+    # Зависимости
     load_data >> preprocess >> train_model >> calc_metrics >> save_results
 ```
 
