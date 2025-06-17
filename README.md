@@ -483,12 +483,55 @@ with DAG(
 
 **Запуск**
 
+---
+## Подтверждение успешного запуска пайплайна
+
+После завершения всех этапов и запуска DAG'а в Apache Airflow (`ml_pipeline_dag`) были получены следующие результаты:
+
+**Все 5 задач выполнены успешно**:
+1. load_data
+2. preprocess
+3. train_model
+4. calc_metrics
+5. save_results
+
+**Файлы сгенерированые и сохранены:**
+- results/eda_report.txt — отчёт по данным
+- results/raw_data.csv — копия исходного датасета
+- results/X_processed.csv и y.csv — предобработанные признаки и метки
+- results/model.pkl — обученная модель
+- results/metrics.json — метрики модели
+- results/final/ — копии всех ключевых файлов для финальной упаковки
+
+**Все артефакты находятся в results/final/:**
+1. eda_report.txt
+2. model.pkl
+3. metrics.json
+4. X_processed.csv
+5. y.csv
+
+**Скриншоты:**
+1. Скриншот интерфейса DAG со статусом "success": 
+![DAG_success](DAG_success)
+
+2. Скриншоты папки results/final/: 
+![DAG_success](DAG_success)
+![DAG_success](DAG_success)
+![DAG_success](DAG_success)
+![DAG_success](DAG_success)
+
+
+2. Скриншоты папки logs/: 
+![logs_lv1.png](logs_lv1.png)
+![logs_lv2.png](logs_lv2.png)
+![logs_lv3.png](logs_lv3.png)
+![logs_lv4.png](logs_lv4.png)
 
 ---
-## Возможные улучшения
+## Возможные улучшения в будущем
 
-- Добавить телеграм-уведомления в DAG
-- Сохранение артефактов в облако (Яндекс.Диск / Google Drive)
-- Разделение train/test через Cross-Validation
-- Использование MLflow для логирования метрик
-- Миграция с BashOperator → PythonOperator
+- Добавить телеграм-уведомления в DAG,
+- Сохранение артефактов в облако (Яндекс.Диск / Google Drive),
+- Разделение train и test через Cross-Validation,
+- Использование MLflow для логирования метрик,
+- Миграция с BashOperator на PythonOperator.
