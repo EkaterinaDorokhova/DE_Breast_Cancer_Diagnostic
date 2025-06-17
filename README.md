@@ -87,6 +87,7 @@ airflow dags trigger ml_pipeline_dag
 - Воспроизводимость
 
 **Код etl/load_data.py**
+
 Ссылка на файл: [load_data.py](https://github.com/EkaterinaDorokhova/DE_Breast_Cancer_Diagnostic/blob/main/load_data.py)
 
 ```python
@@ -151,12 +152,6 @@ if __name__ == "__main__":
     save_copy(df, args.output)
 ```
 
-**Запуск (вручную)**
-
-```bash
-python etl/load_data.py --input data/breast_cancer.csv --output results/
-```
-
 ---
 ## Этап 2. Предобработка данных
 
@@ -171,6 +166,7 @@ python etl/load_data.py --input data/breast_cancer.csv --output results/
 5. Сохранение предобработанных X (X_processed.csv) и y (y.csv) в папку results/.
 
 **Код etl/preprocess.py**
+
 Ссылка на файл: [preprocess.py](https://github.com/EkaterinaDorokhova/DE_Breast_Cancer_Diagnostic/blob/main/preprocess.py)
 
 ```python
@@ -220,12 +216,6 @@ if __name__ == "__main__":
     preprocess(args.input, args.output)
 ```
 
-**Запуск (вручную)**
-
-```bash
-python etl/preprocess.py --input results/raw_data.csv --output results/
-```
-
 **Результат:**
 
 - `results/X_processed.csv` — признаки после масштабирования,
@@ -237,8 +227,10 @@ python etl/preprocess.py --input results/raw_data.csv --output results/
 ### Скрипт 3 - деление на выборки, обучение логистической регрессии, сохранение в pkl (train_model.py)
 
 **Работа скрипта:**
-
-
+1. Загрузка предобработанных данных (X_processed.csv и y.csv),
+2. Деление выборки на обучающую и тестовую,
+3. Обучение модели (LogisticRegression),
+4. Сохранение модели в results/model.pkl через joblib.
 
 **Код etl/train_model.py**
 Ссылка на файл: [train_model.py](https://github.com/EkaterinaDorokhova/DE_Breast_Cancer_Diagnostic/blob/main/train_model.py)
@@ -282,9 +274,9 @@ if __name__ == "__main__":
 
     train_model(args.x, args.y, args.output)
 ```
+**Результат:**
 
-**Запуск**
-
+- results/model.pkl — обученная модель логистической регрессии.
 
 
 ---
@@ -293,7 +285,11 @@ if __name__ == "__main__":
 ### Скрипт 4 - предсказания и расчёт метрик: accuracy, F1 (metrics.py)
 
 **Работа скрипта:**
-
+1. Загрузка обученной модели и тестовых данных (X_processed.csv, y.csv и model.pkl),
+2. Деление данных на train и test,
+3. Предсказания на тестовой выборке (model.predict(X_test))
+4. Расчёт метрик: Accuracy, Precision, Recall, F1-score (с помощью sklearn.metrics)
+5. Сохранение метрик в формате JSON в results/metrics.json.
 
 **Код etl/metrics.py**
 Ссылка на файл: [metrics.py](https://github.com/EkaterinaDorokhova/DE_Breast_Cancer_Diagnostic/blob/main/metrics.py)
@@ -353,9 +349,18 @@ if __name__ == "__main__":
     evaluate_model(args.x, args.y, args.model, args.output)
 ```
 
-**Запуск**
+**Результат:**
 
+Файл results/metrics.json значениями Accuracy, Precision, Recall, F1-score.
 
+```json
+{
+    "accuracy": 0.95,
+    "precision": 0.96,
+    "recall": 0.93,
+    "f1_score": 0.94
+}
+```
 
 ---
 ## Этап 5. Сохранение результатов
@@ -363,8 +368,9 @@ if __name__ == "__main__":
 ### Скрипт 5 - сохранение результатов в results/final/(save_results.py)
 
 **Работа скрипта:**
-
-
+1. Создание финальной папки results/final/,
+2. Копирование файлов из results/`,
+3. Обработка отсутствующих файлов (предупреждение в логах).
 
 **Код etl/save_results.py**
 Ссылка на файл: [save_results.py](https://github.com/EkaterinaDorokhova/DE_Breast_Cancer_Diagnostic/blob/main/save_results.py)
@@ -407,7 +413,14 @@ if __name__ == "__main__":
     save_artifacts(args.source, args.output)
 ```
 
-**Запуск**
+**Результат** - файлы
+
+1. results/final/model.pkl,
+2. results/final/metrics.json,
+3. results/final/eda_report.txt,
+4. results/final/X_processed.csv,
+5. results/final/y.csv.
+
 
 ---
 ## Этап 6. Оркестрация процесса
@@ -420,7 +433,9 @@ if __name__ == "__main__":
 2. Предобработка
 3. Обучение модели
 4. Расчёт метрик
-5. Финализация артефактов
+5. Финализация артефактов.
+
+Запуск вручную из интерфейса Airflow.
 
 **Код pipeline_dag.py**
 Ссылка на файл: [pipeline_dag.py](https://github.com/EkaterinaDorokhova/DE_Breast_Cancer_Diagnostic/blob/main/pipeline_dag.py)
