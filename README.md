@@ -511,17 +511,34 @@ with DAG(
 5. y.csv
 
 **Скриншоты:**
-1. Скриншот интерфейса DAG со статусом "success": 
-![DAG_success](DAG_success)
+1. Скриншоты интерфейса DAG:
 
-2. Скриншоты папки results/final/: 
-![DAG_success](DAG_success)
-![DAG_success](DAG_success)
-![DAG_success](DAG_success)
-![DAG_success](DAG_success)
+Graph со статусами "success":
+![[DAG_Graph_success](DAG_success.png)
 
+Лог задачи 1:
+![[DAG_log_task1](DAG_log_task1.png)
 
-2. Скриншоты папки logs/: 
+Лог задачи 2:
+![[DAG_log_task2](DAG_log_task1.png)
+
+Лог задачи 3:
+![[DAG_log_task3](DAG_log_task1.png)
+
+Лог задачи 4:
+![[DAG_log_task4](DAG_log_task1.png)
+
+Лог задачи 5:
+![[DAG_log_task5](DAG_log_task1.png)
+
+4. Скриншоты папки results/final/:
+![Results_raw_data](Results_raw_data.png)
+![Results_X_proc](Results_X_proc.png)
+![Results_EDA](Results_EDA.png)
+![Results_metrics](Results_metrics.png)
+![Results_target](Results_target.png)
+
+2. Скриншоты папки logs/:
 ![logs_lv1.png](logs_lv1.png)
 ![logs_lv2.png](logs_lv2.png)
 ![logs_lv3.png](logs_lv3.png)
