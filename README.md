@@ -75,21 +75,16 @@ airflow dags trigger ml_pipeline_dag
 
 ### Скрипт 1 - загрузка и первичный анализ данных (load_data.py)
 
-**Цель скрипта:**
-- Загрузить CSV-файл с данными (Breast Cancer Wisconsin Diagnostic)
-- Выполнить базовый EDA: размер, пропущенные значения, типы колонок
-- Сохранить отчёт EDA и (опционально) копию исходного датасета
+**Работа скрипта:**
+- Загрузка CSV-файла с данными (Breast Cancer Wisconsin Diagnostic),
+- Выполнение базового EDA и написание отчёт в results/eda_report.txt (размер, пропущенные значения, типы колонок),
+- Сохранение EDA-отчёта и копии исходного датасета в CSV в results/raw_data.csv.
 
-**Структура** (рекомендуемая по учебным материалам)**
-- Аргументы через `argparse`
-- Минимальный логгинг (`print()` или `logging`)
+**Структура**
+- Аргументы через argparse
+- Минимальный логгинг (print() или logging)
 - Обработка ошибок
 - Воспроизводимость
-
-**Что делает скрипт:**
-- Загружает CSV
-- Пишет краткий EDA-отчет в `results/eda_report.txt`
-- Сохраняет копию CSV в `results/raw_data.csv`
 
 **Код etl/load_data.py**
 
@@ -144,16 +139,84 @@ if __name__ == "__main__":
     save_copy(df, args.output)
 ```
 
-**Запуск вручную**
+**Запуск (вручную)**
 
 ```bash
 python etl/load_data.py --input data/breast_cancer.csv --output results/
 ```
 
 ---
-## Этап 2. Предобработка
+## Этап 2. Предобработка данных
 
-### Скрипт 2
+### Скрипт 2 - очистка и нормализация признаков (preprocess.py)
+
+**Работа скрипта:**
+
+1. Загрузка (raw_data.csv) - используются результат предыдущего шага
+2. Очистка, удаление id, обработка пропусков
+3. Преобразование категориальной переменной diagnosis в число (кодирование M в 1, B в 0)
+4. Масштабирование числовых признаков (StandardScaler)
+5. Сохранение предобработанных X (X_processed.csv) и y (y.csv) в папку results/.
+
+**Код etl/preprocess.py**
+
+```python
+import pandas as pd
+import numpy as np
+import argparse
+import os
+import logging
+from sklearn.preprocessing import StandardScaler
+
+def preprocess(input_file, output_dir):
+    os.makedirs(output_dir, exist_ok=True)
+    df = pd.read_csv(input_file)
+
+    # Удаление неинформативного столбца
+    if 'id' in df.columns:
+        df = df.drop(columns=['id'])
+
+    # Преобразование целевой переменной
+    df['diagnosis'] = df['diagnosis'].map({'M': 1, 'B': 0})
+
+    # Делим на X и y
+    y = df['diagnosis']
+    X = df.drop(columns=['diagnosis'])
+
+    # Масштабирование признаков
+    scaler = StandardScaler()
+    X_scaled = scaler.fit_transform(X)
+    X_scaled_df = pd.DataFrame(X_scaled, columns=X.columns)
+
+    # Сохранение результатов
+    x_path = os.path.join(output_dir, "X_processed.csv")
+    y_path = os.path.join(output_dir, "y.csv")
+    X_scaled_df.to_csv(x_path, index=False)
+    y.to_csv(y_path, index=False)
+
+    logging.info(f"Файлы сохранены: {x_path}, {y_path}")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Предобработка данных: очистка и масштабирование")
+    parser.add_argument("--input", required=True, help="Путь к исходному CSV")
+    parser.add_argument("--output", default="results", help="Путь для вывода")
+
+    args = parser.parse_args()
+    logging.basicConfig(level=logging.INFO)
+
+    preprocess(args.input, args.output)
+```
+
+**Запуск (вручную)**
+
+```bash
+python etl/preprocess.py --input results/raw_data.csv --output results/
+```
+
+**Результат:**
+
+- `results/X_processed.csv` — признаки после масштабирования,
+- `results/y.csv` — целевая переменная числом.
 
 ---
 ## Этап 3. Обучение
