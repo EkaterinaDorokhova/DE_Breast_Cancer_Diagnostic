@@ -514,21 +514,27 @@ with DAG(
 **1. Скриншоты интерфейса DAG:**
 
 Graph со статусами "success":
+
 ![[DAG_Graph_success](DAG_success.png)
 
 Лог задачи 1:
+
 ![[DAG_log_task1](DAG_log_task1.png)
 
 Лог задачи 2:
+
 ![[DAG_log_task2](DAG_log_task2.png)
 
 Лог задачи 3:
+
 ![[DAG_log_task3](DAG_log_task3.png)
 
 Лог задачи 4:
+
 ![[DAG_log_task4](DAG_log_task4.png)
 
 Лог задачи 5:
+
 ![[DAG_log_task5](DAG_log_task5.png)
 
 **2. Скриншоты папки results/final/:**
