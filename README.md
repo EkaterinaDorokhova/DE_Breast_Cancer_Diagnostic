@@ -221,40 +221,239 @@ python etl/preprocess.py --input results/raw_data.csv --output results/
 ---
 ## Этап 3. Обучение
 
-### Скрипт 3
-
-```python
-```
+### Скрипт 3 - (train_model.py)
 
 **Работа скрипта:**
+
+
+
+**Код etl/train_model.py**
+
+```python
+import pandas as pd
+import argparse
+import os
+import logging
+import joblib
+from sklearn.model_selection import train_test_split
+from sklearn.linear_model import LogisticRegression
+
+def train_model(x_path, y_path, output_dir):
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Загрузка данных
+    X = pd.read_csv(x_path)
+    y = pd.read_csv(y_path).squeeze()  # y — Series
+
+    # Разделение на обучающую и тестовую выборки
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Обучение модели
+    model = LogisticRegression(max_iter=1000)
+    model.fit(X_train, y_train)
+
+    # Сохранение модели
+    model_path = os.path.join(output_dir, "model.pkl")
+    joblib.dump(model, model_path)
+    logging.info(f"Модель сохранена в: {model_path}")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Обучение модели логистической регрессии")
+    parser.add_argument("--x", required=True, help="Путь к X_processed.csv")
+    parser.add_argument("--y", required=True, help="Путь к y.csv")
+    parser.add_argument("--output", default="results", help="Путь для сохранения модели")
+
+    args = parser.parse_args()
+    logging.basicConfig(level=logging.INFO)
+
+    train_model(args.x, args.y, args.output)
+```
 
 **Запуск**
 
 
 
 ---
-## Этап 4. Метрики
+## Этап 4. Метрики - (metrics.py)
 
 ### Скрипт 4
 
-```python
-```
-
 **Работа скрипта:**
+
+
+**Код etl/preprocess.py**
+
+```python
+import pandas as pd
+import argparse
+import os
+import logging
+import joblib
+import json
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score
+from sklearn.model_selection import train_test_split
+
+def evaluate_model(x_path, y_path, model_path, output_dir):
+    os.makedirs(output_dir, exist_ok=True)
+
+    # Загрузка данных
+    X = pd.read_csv(x_path)
+    y = pd.read_csv(y_path).squeeze()
+
+    # Деление на train и test
+    _, X_test, _, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+    # Загрузка модели
+    model = joblib.load(model_path)
+
+    # Предсказания
+    y_pred = model.predict(X_test)
+
+    # Метрики
+    metrics = {
+        "accuracy": accuracy_score(y_test, y_pred),
+        "precision": precision_score(y_test, y_pred),
+        "recall": recall_score(y_test, y_pred),
+        "f1_score": f1_score(y_test, y_pred)
+    }
+
+    # Сохранение в JSON
+    metrics_path = os.path.join(output_dir, "metrics.json")
+    with open(metrics_path, "w") as f:
+        json.dump(metrics, f, indent=4)
+
+    logging.info(f"Метрики сохранены в: {metrics_path}")
+    return metrics
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Оценка модели и сохранение метрик")
+    parser.add_argument("--x", required=True, help="Путь к X_processed.csv")
+    parser.add_argument("--y", required=True, help="Путь к y.csv")
+    parser.add_argument("--model", required=True, help="Путь к model.pkl")
+    parser.add_argument("--output", default="results", help="Папка для сохранения метрик")
+
+    args = parser.parse_args()
+    logging.basicConfig(level=logging.INFO)
+
+    evaluate_model(args.x, args.y, args.model, args.output)
+```
 
 **Запуск**
 
 
 
 ---
-## Этап 5. Сохранение результатов
+## Этап 5. Сохранение результатов ()
 
-### Скрипт 5
-
-```python
-```
+### Скрипт 5 - (save_results.py)
 
 **Работа скрипта:**
+
+
+
+**Код etl/preprocess.py**
+
+```python
+import os
+import shutil
+import argparse
+import logging
+
+def save_artifacts(source_dir, output_dir):
+    os.makedirs(output_dir, exist_ok=True)
+
+    files_to_copy = [
+        "model.pkl",
+        "metrics.json",
+        "eda_report.txt",
+        "X_processed.csv",
+        "y.csv"
+    ]
+
+    for filename in files_to_copy:
+        src = os.path.join(source_dir, filename)
+        dst = os.path.join(output_dir, filename)
+
+        if os.path.exists(src):
+            shutil.copy(src, dst)
+            logging.info(f"Файл скопирован: {src} → {dst}")
+        else:
+            logging.warning(f"Файл не найден и не будет скопирован: {src}")
+
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(description="Финальное сохранение артефактов пайплайна")
+    parser.add_argument("--source", default="results", help="Папка с результатами предыдущих шагов")
+    parser.add_argument("--output", default="results/final", help="Папка для финальной выгрузки")
+
+    args = parser.parse_args()
+    logging.basicConfig(level=logging.INFO)
+
+    save_artifacts(args.source, args.output)
+```
+
+**Запуск**
+
+---
+## Этап 6. Оркестрация процесса ()
+
+### Скрипт 6 - оркестрирация всех этапов ETL и ML-пайплайна (pipeline_dag.py)
+
+**Работа скрипта:**
+1. Загрузка данных и EDA
+2. Предобработка
+3. Обучение модели
+4. Расчёт метрик
+5. Финализация артефактов
+
+**Код etl/preprocess.py**
+
+```python
+from airflow import DAG
+from airflow.operators.bash import BashOperator
+from datetime import datetime, timedelta
+
+default_args = {
+    'owner': 'airflow',
+    'retries': 1,
+    'retry_delay': timedelta(minutes=5)
+}
+
+with DAG(
+    dag_id='ml_pipeline_dag',
+    default_args=default_args,
+    description='ETL + ML pipeline with Airflow',
+    schedule_interval=None,
+    start_date=datetime(2023, 1, 1),
+    catchup=False
+) as dag:
+
+    load_data = BashOperator(
+        task_id='load_data',
+        bash_command='python /opt/airflow/etl/load_data.py --input /opt/airflow/data/breast_cancer.csv --output /opt/airflow/results'
+    )
+
+    preprocess = BashOperator(
+        task_id='preprocess',
+        bash_command='python /opt/airflow/etl/preprocess.py --input /opt/airflow/results/raw_data.csv --output /opt/airflow/results'
+    )
+
+    train_model = BashOperator(
+        task_id='train_model',
+        bash_command='python /opt/airflow/etl/train_model.py --x /opt/airflow/results/X_processed.csv --y /opt/airflow/results/y.csv --output /opt/airflow/results'
+    )
+
+    calc_metrics = BashOperator(
+        task_id='calc_metrics',
+        bash_command='python /opt/airflow/etl/metrics.py --x /opt/airflow/results/X_processed.csv --y /opt/airflow/results/y.csv --model /opt/airflow/results/model.pkl --output /opt/airflow/results'
+    )
+
+    save_results = BashOperator(
+        task_id='save_results',
+        bash_command='python /opt/airflow/etl/save_results.py --source /opt/airflow/results --output /opt/airflow/results/final'
+    )
+
+    load_data >> preprocess >> train_model >> calc_metrics >> save_results
+```
 
 **Запуск**
 
