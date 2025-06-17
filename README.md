@@ -502,7 +502,6 @@ with DAG(
     load_data >> preprocess >> train_model >> calc_metrics >> save_results
 ```
 
-**Запуск**
 
 ---
 ## Подтверждение успешного запуска пайплайна
