@@ -94,9 +94,20 @@ import os
 import argparse
 import logging
 
+# Названия колонок взяты из официального описания датасета (https://archive.ics.uci.edu/ml/datasets/Breast+Cancer+Wisconsin+(Diagnostic))
+column_names = [
+    'id', 'diagnosis',
+    'radius_mean', 'texture_mean', 'perimeter_mean', 'area_mean', 'smoothness_mean',
+    'compactness_mean', 'concavity_mean', 'concave_points_mean', 'symmetry_mean', 'fractal_dimension_mean',
+    'radius_se', 'texture_se', 'perimeter_se', 'area_se', 'smoothness_se',
+    'compactness_se', 'concavity_se', 'concave_points_se', 'symmetry_se', 'fractal_dimension_se',
+    'radius_worst', 'texture_worst', 'perimeter_worst', 'area_worst', 'smoothness_worst',
+    'compactness_worst', 'concavity_worst', 'concave_points_worst', 'symmetry_worst', 'fractal_dimension_worst'
+]
+
 def load_csv(file_path):
     try:
-        df = pd.read_csv(file_path)
+        df = pd.read_csv(file_path, header=None, names=column_names)
         logging.info(f"Датасет загружен: {file_path}")
         return df
     except Exception as e:
@@ -114,7 +125,7 @@ def basic_eda(df, output_dir):
     report_path = os.path.join(output_dir, "eda_report.txt")
     with open(report_path, "w") as f:
         f.write(report)
-
+    
     logging.info(f"EDA-отчёт сохранён в: {report_path}")
     return report_path
 
@@ -430,28 +441,42 @@ with DAG(
 
     load_data = BashOperator(
         task_id='load_data',
-        bash_command='python /opt/airflow/etl/load_data.py --input /opt/airflow/data/breast_cancer.csv --output /opt/airflow/results'
+        bash_command='python "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/etl/load_data.py" '
+                     '--input "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/data/breast_cancer.csv" '
+                     '--output "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/results"'
     )
 
     preprocess = BashOperator(
         task_id='preprocess',
-        bash_command='python /opt/airflow/etl/preprocess.py --input /opt/airflow/results/raw_data.csv --output /opt/airflow/results'
+        bash_command='python "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/etl/preprocess.py" '
+                     '--input "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/results/raw_data.csv" '
+                     '--output "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/results"'
     )
 
     train_model = BashOperator(
         task_id='train_model',
-        bash_command='python /opt/airflow/etl/train_model.py --x /opt/airflow/results/X_processed.csv --y /opt/airflow/results/y.csv --output /opt/airflow/results'
+        bash_command='python "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/etl/train_model.py" '
+                     '--x "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/results/X_processed.csv" '
+                     '--y "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/results/y.csv" '
+                     '--output "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/results"'
     )
 
     calc_metrics = BashOperator(
         task_id='calc_metrics',
-        bash_command='python /opt/airflow/etl/metrics.py --x /opt/airflow/results/X_processed.csv --y /opt/airflow/results/y.csv --model /opt/airflow/results/model.pkl --output /opt/airflow/results'
+        bash_command='python "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/etl/metrics.py" '
+                     '--x "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/results/X_processed.csv" '
+                     '--y "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/results/y.csv" '
+                     '--model "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/results/model.pkl" '
+                     '--output "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/results"'
     )
 
     save_results = BashOperator(
         task_id='save_results',
-        bash_command='python /opt/airflow/etl/save_results.py --source /opt/airflow/results --output /opt/airflow/results/final'
+        bash_command='python "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/etl/save_results.py" '
+                     '--source "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/results" '
+                     '--output "/Users/ekaterina.dorokhova/Desktop/Инжиниринг данных/Экзамен/DE_final_project/airflow_home/results/final"'
     )
+
     # Зависимости
     load_data >> preprocess >> train_model >> calc_metrics >> save_results
 ```
