@@ -229,6 +229,7 @@ if __name__ == "__main__":
 4. Сохранение модели в results/model.pkl через joblib.
 
 **Код etl/train_model.py**
+
 Ссылка на файл: [train_model.py](https://github.com/EkaterinaDorokhova/DE_Breast_Cancer_Diagnostic/blob/main/train_model.py)
 
 ```python
@@ -288,6 +289,7 @@ if __name__ == "__main__":
 5. Сохранение метрик в формате JSON в results/metrics.json.
 
 **Код etl/metrics.py**
+
 Ссылка на файл: [metrics.py](https://github.com/EkaterinaDorokhova/DE_Breast_Cancer_Diagnostic/blob/main/metrics.py)
 
 ```python
@@ -369,6 +371,7 @@ if __name__ == "__main__":
 3. Обработка отсутствующих файлов (предупреждение в логах).
 
 **Код etl/save_results.py**
+
 Ссылка на файл: [save_results.py](https://github.com/EkaterinaDorokhova/DE_Breast_Cancer_Diagnostic/blob/main/save_results.py)
 
 ```python
@@ -434,6 +437,7 @@ if __name__ == "__main__":
 Запуск вручную из интерфейса Airflow.
 
 **Код pipeline_dag.py**
+
 Ссылка на файл: [pipeline_dag.py](https://github.com/EkaterinaDorokhova/DE_Breast_Cancer_Diagnostic/blob/main/pipeline_dag.py)
 
 ```python
@@ -530,7 +534,6 @@ with DAG(
 **1. Скриншоты интерфейса DAG:**
 
 Graph со статусами "success":
-
 ![DAG_Graph_success](DAG_success.png)
 
 Лог задачи 1:
@@ -543,7 +546,6 @@ Graph со статусами "success":
 ![DAG_log_task3](DAG_log_task3.png)
 
 Лог задачи 4:
-
 ![DAG_log_task4](DAG_log_task4.png)
 
 Лог задачи 5:
