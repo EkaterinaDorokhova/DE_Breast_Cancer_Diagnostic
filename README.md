@@ -87,6 +87,7 @@ airflow dags trigger ml_pipeline_dag
 - Воспроизводимость
 
 **Код etl/load_data.py**
+Ссылка на файл: [load_data.py](https://github.com/EkaterinaDorokhova/DE_Breast_Cancer_Diagnostic/blob/main/load_data.py)
 
 ```python
 import pandas as pd
@@ -170,6 +171,7 @@ python etl/load_data.py --input data/breast_cancer.csv --output results/
 5. Сохранение предобработанных X (X_processed.csv) и y (y.csv) в папку results/.
 
 **Код etl/preprocess.py**
+Ссылка на файл: [preprocess.py](https://github.com/EkaterinaDorokhova/DE_Breast_Cancer_Diagnostic/blob/main/preprocess.py)
 
 ```python
 import pandas as pd
@@ -239,6 +241,7 @@ python etl/preprocess.py --input results/raw_data.csv --output results/
 
 
 **Код etl/train_model.py**
+Ссылка на файл: [train_model.py](https://github.com/EkaterinaDorokhova/DE_Breast_Cancer_Diagnostic/blob/main/train_model.py)
 
 ```python
 import pandas as pd
@@ -293,6 +296,7 @@ if __name__ == "__main__":
 
 
 **Код etl/metrics.py**
+Ссылка на файл: [metrics.py](https://github.com/EkaterinaDorokhova/DE_Breast_Cancer_Diagnostic/blob/main/metrics.py)
 
 ```python
 import pandas as pd
@@ -363,6 +367,7 @@ if __name__ == "__main__":
 
 
 **Код etl/save_results.py**
+Ссылка на файл: [save_results.py](https://github.com/EkaterinaDorokhova/DE_Breast_Cancer_Diagnostic/blob/main/save_results.py)
 
 ```python
 import os
@@ -418,6 +423,7 @@ if __name__ == "__main__":
 5. Финализация артефактов
 
 **Код pipeline_dag.py**
+Ссылка на файл: [pipeline_dag.py](https://github.com/EkaterinaDorokhova/DE_Breast_Cancer_Diagnostic/blob/main/pipeline_dag.py)
 
 ```python
 from airflow import DAG
